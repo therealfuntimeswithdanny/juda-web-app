@@ -5,189 +5,23 @@
   <meta name="viewport" content="width=device-width, initial-scale=1" />
   <title>Notes App</title>
   
+  <!-- Favicon (icon.svg) -->
+  <link rel="icon" href="icon.svg" type="image/svg+xml">
+  
+  <!-- External CSS -->
+  <link rel="stylesheet" href="style.css">
+  
   <!-- Font Awesome Kit (using your provided link) -->
   <script src="https://kit.fontawesome.com/0ca27f8db1.js" crossorigin="anonymous"></script>
-  
-  <style>
-    /* Loader overlay styles */
-    #loader {
-      position: fixed;
-      top: 0;
-      left: 0;
-      width: 100%;
-      height: 100%;
-      background-color: #fff;
-      display: flex;
-      justify-content: center;
-      align-items: center;
-      z-index: 9999;
-      transition: opacity 0.5s ease-out;
-    }
-
-    .loader-spinner {
-      border: 16px solid #f3f3f3;
-      border-top: 16px solid #9c27b0;
-      border-radius: 50%;
-      width: 120px;
-      height: 120px;
-      animation: spin 2s linear infinite;
-    }
-
-    @keyframes spin {
-      0% { transform: rotate(0deg); }
-      100% { transform: rotate(360deg); }
-    }
-
-    /* Overall container */
-    .container {
-      display: flex;
-      height: 100vh;
-      font-family: Arial, sans-serif;
-    }
-
-    /* Sidebar styles with flex layout for footer positioning */
-    #sidebar {
-      width: 250px;
-      background-color: #f5f5f5;
-      padding: 10px;
-      border-right: 1px solid #ddd;
-      display: flex;
-      flex-direction: column;
-    }
-
-    /* Shared style for sidebar buttons – updated background color */
-    .sidebar-button {
-      width: 100%;
-      padding: 10px;
-      margin-bottom: 10px;
-      background-color: #9c27b0;
-      color: #fff;
-      border: none;
-      cursor: pointer;
-      font-size: 1em;
-      border-radius: 4px;
-    }
-
-    /* List of notes fills remaining vertical space */
-    #notesList {
-      list-style-type: none;
-      padding: 0;
-      flex: 1;
-      overflow-y: auto;
-    }
-    #notesList li {
-      padding: 8px;
-      margin-bottom: 5px;
-      cursor: pointer;
-      border-radius: 4px;
-    }
-    #notesList li:hover {
-      background-color: #eee;
-    }
-
-    /* Sidebar Footer styling with provided footer content */
-    #sidebarFooter {
-      border-top: 1px solid #ddd;
-      padding-top: 10px;
-      text-align: center;
-      font-size: 0.9em;
-      color: #777;
-    }
-    
-    /* Editor area styles */
-    #editor {
-      flex: 1;
-      padding: 20px;
-      display: flex;
-      flex-direction: column;
-    }
-    #noteTitle {
-      font-size: 1.5em;
-      padding: 8px;
-      margin-bottom: 10px;
-      border: 1px solid #ddd;
-      border-radius: 4px;
-    }
-
-    /* Toolbar for rich text formatting */
-    #toolbar {
-      margin-bottom: 10px;
-    }
-    #toolbar * {
-      margin-right: 5px;
-      margin-bottom: 5px;
-    }
-    #toolbar button,
-    #toolbar select {
-      padding: 5px 10px;
-      border: 1px solid #ddd;
-      background-color: #fff;
-      border-radius: 3px;
-      cursor: pointer;
-      font-size: 1em;
-    }
-    #toolbar select {
-      cursor: pointer;
-    }
-
-    /* Editable note area styles */
-    #noteContent {
-      flex: 1;
-      border: 1px solid #ddd;
-      padding: 10px;
-      border-radius: 4px;
-      overflow-y: auto;
-      background-color: #fff;
-    }
-
-    /* Editor action buttons – updated background color */
-    #editorButtons {
-      text-align: right;
-      margin-top: 10px;
-    }
-    #editorButtons button {
-      padding: 10px 20px;
-      margin-left: 5px;
-      border: none;
-      background-color: #9c27b0;
-      color: #fff;
-      border-radius: 3px;
-      cursor: pointer;
-      font-size: 0.9em;
-    }
-
-    /* Responsive adjustments */
-    @media (max-width: 768px) {
-      .container {
-        flex-direction: column;
-      }
-      #sidebar {
-        width: 100%;
-        border-right: none;
-        border-bottom: 1px solid #ddd;
-      }
-      #notesList {
-        display: flex;
-        flex-direction: row;
-        overflow-x: auto;
-      }
-      #notesList li {
-        padding: 10px;
-        margin-right: 5px;
-        white-space: nowrap;
-      }
-    }
-  </style>
 </head>
 <body>
-  
   <!-- Loader Overlay -->
   <div id="loader">
     <div class="loader-spinner"></div>
   </div>
   
   <div class="container">
-    <!-- Sidebar with control buttons, notes list, and footer -->
+    <!-- Sidebar -->
     <div id="sidebar">
       <button id="newNoteBtn" class="sidebar-button">
         <i class="fa-solid fa-plus"></i> New Note
@@ -199,7 +33,7 @@
         <i class="fa-solid fa-download"></i> Export All Notes
       </button>
       <ul id="notesList">
-        <!-- Dynamic list of saved notes from localStorage will appear here -->
+        <!-- Dynamically generated note items will appear here -->
       </ul>
       <div id="sidebarFooter">
         <p>&copy; 2025-2029 Juda Notes<br>
@@ -208,289 +42,54 @@
       </div>
     </div>
 
-    <!-- Main editor area -->
+    <!-- Editor Area -->
     <div id="editor">
       <input type="text" id="noteTitle" placeholder="Note Title" />
       
-      <!-- Toolbar for rich text commands -->
+      <!-- Toolbar -->
       <div id="toolbar">
-        <!-- Dropdown for text sizes -->
         <select id="formatBlockSelect">
           <option value="p">Normal Text</option>
           <option value="h1">Heading 1</option>
           <option value="h2">Heading 2</option>
           <option value="h3">Heading 3</option>
         </select>
-        <!-- Basic text formatting buttons -->
         <button data-command="bold" title="Bold"><i class="fa-solid fa-bold"></i></button>
         <button data-command="italic" title="Italic"><i class="fa-solid fa-italic"></i></button>
         <button data-command="underline" title="Underline"><i class="fa-solid fa-underline"></i></button>
-        
-        <!-- List commands -->
-        <button data-command="insertUnorderedList" title="Bullet List">
-          <i class="fa-solid fa-list-ul"></i>
-        </button>
-        <button data-command="insertOrderedList" title="Numbered List">
-          <i class="fa-solid fa-list-ol"></i>
-        </button>
-        
-        <!-- Text alignment commands -->
-        <button data-command="justifyLeft" title="Align Left">
-          <i class="fa-solid fa-align-left"></i>
-        </button>
-        <button data-command="justifyCenter" title="Align Center">
-          <i class="fa-solid fa-align-center"></i>
-        </button>
-        <button data-command="justifyRight" title="Align Right">
-          <i class="fa-solid fa-align-right"></i>
-        </button>
+        <button data-command="insertUnorderedList" title="Bullet List"><i class="fa-solid fa-list-ul"></i></button>
+        <button data-command="insertOrderedList" title="Numbered List"><i class="fa-solid fa-list-ol"></i></button>
+        <button data-command="justifyLeft" title="Align Left"><i class="fa-solid fa-align-left"></i></button>
+        <button data-command="justifyCenter" title="Align Center"><i class="fa-solid fa-align-center"></i></button>
+        <button data-command="justifyRight" title="Align Right"><i class="fa-solid fa-align-right"></i></button>
+        <button id="uploadImageBtn" title="Upload Image"><i class="fa-solid fa-image"></i></button>
       </div>
       
-      <!-- Editable note area with pre-filled text -->
+      <!-- Editable Note Area -->
       <div id="noteContent" contenteditable="true">
         Click "New Note" on the Sidebar then start Typing or Select a Note to Edit
       </div>
       
+      <!-- Bottom Editor Info and Buttons -->
       <div id="editorButtons">
-        <button id="saveNoteBtn">
-          <i class="fa-solid fa-save"></i> Save Note
-        </button>
-        <button id="deleteNoteBtn">
-          <i class="fa-solid fa-trash"></i> Delete Note
-        </button>
-        <button id="exportNoteBtn">
-          <i class="fa-solid fa-file-export"></i> Export Active Note
-        </button>
+        <div id="editorInfo">
+          <span id="storageUsage">Storage used: 0.00 KB (0%) / 3 MB</span>
+          <span id="lastSaved">Last Saved: Never</span>
+        </div>
+        <div class="button-group">
+          <button id="saveNoteBtn"><i class="fa-solid fa-save"></i> Save Note</button>
+          <button id="deleteNoteBtn"><i class="fa-solid fa-trash"></i> Delete Note</button>
+          <button id="exportNoteBtn"><i class="fa-solid fa-file-export"></i> Export Active Note</button>
+        </div>
       </div>
     </div>
   </div>
-
-  <!-- Hidden file input for importing notes -->
-  <input type="file" id="importFileInput" accept=".json" style="display: none;" />
-
-  <script>
-    // Hide the loader overlay when all content is loaded
-    window.addEventListener('load', function() {
-      const loader = document.getElementById('loader');
-      loader.style.opacity = 0;
-      setTimeout(() => {
-        loader.style.display = 'none';
-      }, 500); // match the CSS transition time or adjust as needed.
-    });
-    
-    // Global variables for notes and active note id.
-    let notes = [];
-    let activeNoteId = null;
-
-    // Load any saved notes from localStorage and render them in the sidebar.
-    function loadNotes() {
-      const saved = localStorage.getItem('notes');
-      if (saved) {
-        notes = JSON.parse(saved);
-      } else {
-        notes = [];
-      }
-      renderNotesList();
-    }
-
-    // Save the notes array to localStorage.
-    function persistNotes() {
-      localStorage.setItem('notes', JSON.stringify(notes));
-    }
-
-    // Render the saved notes in the sidebar.
-    function renderNotesList() {
-      const notesList = document.getElementById('notesList');
-      // Clear the current list.
-      notesList.innerHTML = '';
-      
-      if (notes.length === 0) {
-        const emptyMessage = document.createElement('li');
-        emptyMessage.textContent = 'No saved notes.';
-        emptyMessage.style.fontStyle = 'italic';
-        emptyMessage.style.color = '#555';
-        notesList.appendChild(emptyMessage);
-      } else {
-        notes.forEach(note => {
-          const li = document.createElement('li');
-          li.textContent = note.title || 'Untitled note';
-          li.dataset.id = note.id;
-          li.addEventListener('click', () => loadNote(note.id));
-          notesList.appendChild(li);
-        });
-      }
-    }
-
-    // Create a new note with a unique id.
-    function createNewNote() {
-      const newNote = {
-        id: Date.now().toString(),
-        title: 'Untitled note',
-        content: '', // Clear the content on new note
-        updatedAt: new Date()
-      };
-      notes.push(newNote);
-      persistNotes();
-      renderNotesList();
-      loadNote(newNote.id);
-    }
-
-    // Load a specific note into the editor.
-    function loadNote(id) {
-      const note = notes.find(n => n.id === id);
-      if (note) {
-        activeNoteId = note.id;
-        document.getElementById('noteTitle').value = note.title;
-        document.getElementById('noteContent').innerHTML = note.content;
-      }
-    }
-
-    // Save the active note's title and content to localStorage.
-    function saveActiveNote() {
-      if (activeNoteId) {
-        const note = notes.find(n => n.id === activeNoteId);
-        if (note) {
-          note.title = document.getElementById('noteTitle').value;
-          note.content = document.getElementById('noteContent').innerHTML;
-          note.updatedAt = new Date();
-          persistNotes();
-          renderNotesList();
-          alert('Note saved!');
-        }
-      }
-    }
-
-    // Delete the active note.
-    function deleteActiveNote() {
-      if (activeNoteId) {
-        notes = notes.filter(n => n.id !== activeNoteId);
-        persistNotes();
-        renderNotesList();
-        document.getElementById('noteTitle').value = '';
-        document.getElementById('noteContent').innerHTML = 'Click "New Note" on the Sidebar then start Typing or Select a Note to Edit';
-        activeNoteId = null;
-      }
-    }
-
-    // Export the active note as an HTML file.
-    function exportActiveNote() {
-      if (activeNoteId) {
-        const note = notes.find(n => n.id === activeNoteId);
-        if (note) {
-          const fileContent = `
-<!DOCTYPE html>
-<html>
-  <head>
-    <meta charset="UTF-8">
-    <title>${note.title}</title>
-  </head>
-  <body>
-    ${note.content}
-  </body>
-</html>`;
-          const blob = new Blob([fileContent], { type: 'text/html' });
-          const url = URL.createObjectURL(blob);
-          const a = document.createElement('a');
-          a.href = url;
-          a.download = note.title ? note.title + '.html' : 'note.html';
-          document.body.appendChild(a);
-          a.click();
-          document.body.removeChild(a);
-          URL.revokeObjectURL(url);
-        }
-      }
-    }
-
-    // Export all notes as a JSON file.
-    function exportAllNotes() {
-      const jsonNotes = JSON.stringify(notes, null, 2);
-      const blob = new Blob([jsonNotes], { type: 'application/json' });
-      const url = URL.createObjectURL(blob);
-      const a = document.createElement('a');
-      a.href = url;
-      a.download = 'notes_backup.json';
-      document.body.appendChild(a);
-      a.click();
-      document.body.removeChild(a);
-      URL.revokeObjectURL(url);
-    }
-
-    // Import notes from a selected JSON file.
-    function handleImportNotes(event) {
-      const file = event.target.files[0];
-      if (!file) return;
-      
-      const reader = new FileReader();
-      reader.onload = function(e) {
-        try {
-          const importedNotes = JSON.parse(e.target.result);
-          if (!Array.isArray(importedNotes)) {
-            alert('Invalid file format. Expected a JSON array of notes.');
-            return;
-          }
-          // Merge or replace based on user confirmation.
-          if (confirm('Press OK to merge imported notes with your current notes, or Cancel to replace them.')) {
-            notes = notes.concat(importedNotes);
-          } else {
-            notes = importedNotes;
-          }
-          persistNotes();
-          renderNotesList();
-          alert('Notes imported successfully.');
-        } catch (err) {
-          alert('Error parsing JSON: ' + err.message);
-        }
-      };
-      reader.readAsText(file);
-      event.target.value = "";
-    }
-
-    // Set up the toolbar to execute rich text commands.
-    function setupToolbar() {
-      // Standard command buttons.
-      document.querySelectorAll('#toolbar button').forEach(button => {
-        button.addEventListener('click', () => {
-          const command = button.getAttribute('data-command');
-          document.execCommand(command, false, null);
-        });
-      });
-
-      // Dropdown for text format (heading/normal text).
-      document.getElementById('formatBlockSelect').addEventListener('change', function() {
-        document.execCommand('formatBlock', false, '<' + this.value + '>');
-      });
-    }
-
-    // Attach event listeners to control buttons.
-    document.getElementById('newNoteBtn').addEventListener('click', createNewNote);
-    document.getElementById('saveNoteBtn').addEventListener('click', saveActiveNote);
-    document.getElementById('deleteNoteBtn').addEventListener('click', deleteActiveNote);
-    document.getElementById('exportNoteBtn').addEventListener('click', exportActiveNote);
-    document.getElementById('exportNotesBtn').addEventListener('click', exportAllNotes);
-    document.getElementById('importNotesBtn').addEventListener('click', () => {
-      document.getElementById('importFileInput').click();
-    });
-    document.getElementById('importFileInput').addEventListener('change', handleImportNotes);
-
-    // Initialize the app.
-    setupToolbar();
-    loadNotes();
-  </script>
-    <script>    
-    // Initialize the app.
-    setupToolbar();
-    loadNotes();
-
-    // Register the Service Worker for offline caching.
-    if ('serviceWorker' in navigator) {
-      window.addEventListener('load', function() {
-        navigator.serviceWorker.register('sw.js').then(registration => {
-          console.log('Service Worker registered with scope:', registration.scope);
-        }).catch(error => {
-          console.log('Service Worker registration failed:', error);
-        });
-      });
-    }
-  </script>
+  
+  <!-- Hidden File Inputs -->
+  <input type="file" id="importFileInput" accept=".json" style="display: none;">
+  <input type="file" id="imageFileInput" accept="image/*" style="display: none;">
+  
+  <!-- External JavaScript -->
+  <script src="script.js"></script>
 </body>
 </html>

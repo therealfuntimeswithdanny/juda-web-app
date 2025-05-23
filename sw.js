@@ -1,8 +1,10 @@
-const CACHE_NAME = 'notes-app-cache-v2';
+const CACHE_NAME = 'notes-app-cache-v3';
 const urlsToCache = [
   '/',
   '/index.html',
-    'https://kit.fontawesome.com/0ca27f8db1.js",
+  'https://kit.fontawesome.com/0ca27f8db1.js',
+  '/style.css',
+  '/script.js',  
   // If you had external CSS or JS files, list them here.
   // For example: '/css/style.css', '/js/app.js'
 ];
