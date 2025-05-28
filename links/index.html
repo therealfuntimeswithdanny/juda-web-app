@@ -11,13 +11,16 @@
   <!-- External CSS -->
   <link rel="stylesheet" href="style.css">
   
-  <!-- Font Awesome (for icons) -->
+  <!-- Font Awesome for icons -->
   <script src="https://kit.fontawesome.com/0ca27f8db1.js" crossorigin="anonymous"></script>
 </head>
 <body>
   <div class="container">
     <!-- Sidebar -->
     <div id="sidebar">
+      <div class="sidebar-header">
+        <h1>Juda Links</h1>
+      </div>
       <button id="newLinkBtn" class="sidebar-button">
         <i class="fa-solid fa-link"></i> New Link
       </button>
@@ -28,45 +31,35 @@
         <i class="fa-solid fa-download"></i> Export Links
       </button>
       <ul id="linksList">
-        <!-- Saved links will be rendered here -->
+        <!-- Saved links will be rendered here by script.js -->
       </ul>
       <div id="sidebarFooter">
-        <p>&copy; 2025-2029 Juda Links<br>
-          <i>A <a href="https://corp.madebydanny.uk" target="_blank">Funtimes Media</a> Company</i>
-        </p>
+        <p>&copy; 2025-2029 Juda Links</p>
       </div>
     </div>
 
     <!-- Editor Area -->
     <div id="editor">
-      <input type="text" id="linkTitle" placeholder="Link Title" />
-      <input type="url" id="linkURL" placeholder="https://example.com" />
-      
-      <!-- Pinned Links Section -->
-      <div id="pinnedLinksSection">
-        <h3>Pinned Links</h3>
-        <div id="pinnedLinksList">
-          <!-- Pinned links will appear here -->
-        </div>
+      <div class="link-inputs">
+        <input type="text" id="linkTitle" placeholder="Link Title" />
+        <input type="url" id="linkURL" placeholder="https://example.com" />
       </div>
-
-      <!-- Bottom Row: Editor Info and Control Buttons -->
-      <div id="editorButtons">
-        <div id="editorInfo">
-          <span id="storageUsage">Storage used: 0.00 KB (0%) / 3 MB</span>
-          <span id="lastSaved">Last Saved: Never</span>
-        </div>
-        <div class="button-group">
-          <button id="saveLinkBtn"><i class="fa-solid fa-save"></i> Save Link</button>
-          <button id="pinLinkBtn"><i class="fa-solid fa-thumbtack"></i> Pin Link</button>
-          <button id="deleteLinkBtn"><i class="fa-solid fa-trash"></i> Delete Link</button>
-          <button id="openLinkBtn"><i class="fa-solid fa-external-link"></i> Open Link</button>
-        </div>
+      <div class="button-group">
+        <button id="openLinkBtn" class="primary-btn">
+          <i class="fa-solid fa-external-link-alt"></i> Open Link
+        </button>
+        <button id="saveLinkBtn"><i class="fa-solid fa-save"></i> Save Link</button>
+        <button id="pinLinkBtn"><i class="fa-solid fa-thumbtack"></i> Pin Link</button>
+        <button id="deleteLinkBtn"><i class="fa-solid fa-trash"></i> Delete Link</button>
+      </div>
+      <div id="editorInfo">
+        <span id="storageUsage">Storage used: 0.00 KB (0%) / 3 MB</span>
+        <span id="lastSaved">Last Saved: Never</span>
       </div>
     </div>
   </div>
-  
-  <!-- Hidden File Input for Importing Links -->
+
+  <!-- Hidden file input for importing links -->
   <input type="file" id="importFileInput" accept=".json" style="display: none;">
   
   <!-- External JavaScript -->
