@@ -1,22 +1,15 @@
-// Hide the loader overlay when the content is fully loaded.
-window.addEventListener('load', function() {
-  const loader = document.getElementById('loader');
-  loader.style.opacity = 0;
-  setTimeout(() => {
-    loader.style.display = 'none';
-  }, 500);
-});
-
 // Global variables for notes and the active note ID.
 let notes = [];
 let activeNoteId = null;
 
-// Update storage usage based on the size of the notes (3 MB limit).
+/* ------------------------------
+   STORAGE & STATUS FUNCTIONS 
+------------------------------ */
 function updateStorageUsage() {
-  const storageElem = document.getElementById('storageUsage');
+  const storageElem = document.getElementById("storageUsage");
   const notesString = JSON.stringify(notes);
   const sizeBytes = new Blob([notesString]).size;
-  const LIMIT_BYTES = 3145728; // 3 MB in bytes.
+  const LIMIT_BYTES = 3145728; // 3 MB in bytes
   const sizeKB = sizeBytes / 1024;
   let sizeDisplay;
 
@@ -30,9 +23,8 @@ function updateStorageUsage() {
   const usagePercent = (sizeBytes / LIMIT_BYTES) * 100;
   const usageText = "Storage used: " + sizeDisplay + " (" + usagePercent.toFixed(0) + "%) / 3 MB";
 
-  // Color-coding based on usage percentage.
-  const ratio = sizeBytes / LIMIT_BYTES;
   let color;
+  const ratio = sizeBytes / LIMIT_BYTES;
   if (ratio < 0.5) {
     color = "green";
   } else if (ratio < 0.75) {
@@ -47,54 +39,61 @@ function updateStorageUsage() {
   storageElem.style.color = color;
 }
 
-// Update the "Last Saved" display.
 function updateLastSaved() {
-  const lastSavedElem = document.getElementById('lastSaved');
+  const lastSavedElem = document.getElementById("lastSaved");
   const now = new Date();
   lastSavedElem.textContent = "Last Saved: " + now.toLocaleTimeString();
 }
 
-// Load notes from localStorage.
+/* ------------------------------
+   NOTES PERSISTENCE & RENDERING 
+------------------------------ */
 function loadNotes() {
-  const saved = localStorage.getItem('notes');
+  const saved = localStorage.getItem("judaNotes");
   notes = saved ? JSON.parse(saved) : [];
   renderNotesList();
 }
 
-// Save notes to localStorage and update the storage usage.
 function persistNotes() {
-  localStorage.setItem('notes', JSON.stringify(notes));
+  localStorage.setItem("judaNotes", JSON.stringify(notes));
   updateStorageUsage();
 }
 
-// Render the list of saved notes in the sidebar.
 function renderNotesList() {
-  const notesList = document.getElementById('notesList');
+  const notesList = document.getElementById("notesList");
   notesList.innerHTML = "";
 
   if (notes.length === 0) {
-    const emptyMessage = document.createElement('li');
+    const emptyMessage = document.createElement("li");
     emptyMessage.textContent = "No saved notes.";
     emptyMessage.style.fontStyle = "italic";
     emptyMessage.style.color = "#555";
     notesList.appendChild(emptyMessage);
   } else {
     notes.forEach(note => {
-      const li = document.createElement('li');
-      li.textContent = note.title || "Untitled note";
+      const li = document.createElement("li");
+      li.textContent = note.title || "Untitled";
       li.dataset.id = note.id;
       li.addEventListener("click", () => loadNote(note.id));
+      li.addEventListener("dblclick", () => {
+        if (note.compressedContent) {
+          alert(LZString.decompressFromUTF16(note.compressedContent));
+        }
+      });
       notesList.appendChild(li);
     });
   }
 }
 
-// Create a new note.
+/* ------------------------------
+   NOTES CRUD OPERATIONS 
+------------------------------ */
 function createNewNote() {
   const newNote = {
     id: Date.now().toString(),
-    title: "Untitled note",
-    content: "", // New note starts empty.
+    title: "Untitled",
+    // Initialize with default content.
+    compressedContent: LZString.compressToUTF16("Click \"New Note\" on the sidebar then start typing or select a note to edit."),
     updatedAt: new Date()
   };
   notes.push(newNote);
@@ -103,23 +102,26 @@ function createNewNote() {
   loadNote(newNote.id);
 }
 
-// Load a specific note into the editor.
 function loadNote(id) {
   const note = notes.find(n => n.id === id);
   if (note) {
     activeNoteId = note.id;
     document.getElementById("noteTitle").value = note.title;
-    document.getElementById("noteContent").innerHTML = note.content;
+    // Decompress the content before displaying it.
+    document.getElementById("noteContent").innerHTML = note.compressedContent
+      ? LZString.decompressFromUTF16(note.compressedContent)
+      : "";
   }
 }
 
-// Save the active note. If 'auto' is true, no alert is shown.
 function saveActiveNote(auto = false) {
   if (activeNoteId) {
     const note = notes.find(n => n.id === activeNoteId);
     if (note) {
       note.title = document.getElementById("noteTitle").value;
-      note.content = document.getElementById("noteContent").innerHTML;
+      const content = document.getElementById("noteContent").innerHTML;
+      // Compress content before saving.
+      note.compressedContent = LZString.compressToUTF16(content);
       note.updatedAt = new Date();
       persistNotes();
       renderNotesList();
@@ -131,20 +133,17 @@ function saveActiveNote(auto = false) {
   }
 }
 
-// Delete the active note.
 function deleteActiveNote() {
   if (activeNoteId) {
     notes = notes.filter(n => n.id !== activeNoteId);
     persistNotes();
     renderNotesList();
     document.getElementById("noteTitle").value = "";
-    document.getElementById("noteContent").innerHTML =
-      'Click "New Note" on the Sidebar then start Typing or Select a Note to Edit';
+    document.getElementById("noteContent").innerHTML = "";
     activeNoteId = null;
   }
 }
 
-// Export the active note as an HTML file.
 function exportActiveNote() {
   if (activeNoteId) {
     const note = notes.find(n => n.id === activeNoteId);
@@ -157,7 +156,7 @@ function exportActiveNote() {
     <title>${note.title}</title>
   </head>
   <body>
-    ${note.content}
+    ${LZString.decompressFromUTF16(note.compressedContent)}
   </body>
 </html>`;
       const blob = new Blob([fileContent], { type: "text/html" });
@@ -173,21 +172,19 @@ function exportActiveNote() {
   }
 }
 
-// Export all notes as a JSON file.
 function exportAllNotes() {
   const jsonNotes = JSON.stringify(notes, null, 2);
   const blob = new Blob([jsonNotes], { type: "application/json" });
   const url = URL.createObjectURL(blob);
   const a = document.createElement("a");
   a.href = url;
-  a.download = "notes_backup.json";
+  a.download = "juda_notes_backup.json";
   document.body.appendChild(a);
   a.click();
   document.body.removeChild(a);
   URL.revokeObjectURL(url);
 }
 
-// Import notes from a JSON file.
 function handleImportNotes(event) {
   const file = event.target.files[0];
   if (!file) return;
@@ -216,7 +213,32 @@ function handleImportNotes(event) {
   event.target.value = "";
 }
 
-// Set up the toolbar for rich text commands.
+/* ------------------------------
+   URL NOTE ADDITION & COMPRESSOR 
+------------------------------ */
+// When the page loads, check if a query parameter "add" is present.
+// Example: app.html?add=This%20is%20my%20note
+window.addEventListener("DOMContentLoaded", function() {
+  const params = new URLSearchParams(window.location.search);
+  const addText = params.get("add");
+  if (addText) {
+    // Create a new note with the provided text (compressed before saving)
+    const newNote = {
+      id: Date.now().toString(),
+      title: "Note from URL",
+      compressedContent: LZString.compressToUTF16(addText),
+      updatedAt: new Date()
+    };
+    notes.push(newNote);
+    persistNotes();
+    renderNotesList();
+    // Optionally, clear the URL query string after processing.
+  }
+});
+
+/* ------------------------------
+   TOOLBAR FOR RICH TEXT COMMANDS 
+------------------------------ */
 function setupToolbar() {
   document.querySelectorAll("#toolbar button[data-command]").forEach(button => {
     button.addEventListener("click", () => {
@@ -227,42 +249,38 @@ function setupToolbar() {
   document.getElementById("formatBlockSelect").addEventListener("change", function() {
     document.execCommand("formatBlock", false, "<" + this.value + ">");
   });
-  
-  // Set up the Upload Image button.
-  document.getElementById("uploadImageBtn").addEventListener("click", function() {
-    document.getElementById("imageFileInput").click();
-  });
-  document.getElementById("imageFileInput").addEventListener("change", function(e) {
-    const file = e.target.files[0];
-    if (file) {
-      const reader = new FileReader();
-      reader.onload = function(event) {
-        // Insert the image as a Data URL at the caret position.
-        document.execCommand("insertImage", false, event.target.result);
-      };
-      reader.readAsDataURL(file);
-    }
-    e.target.value = "";
-  });
 }
 
-// Attach event listeners for control buttons.
+/* ------------------------------
+   EVENT ATTACHMENT 
+------------------------------ */
 document.getElementById("newNoteBtn").addEventListener("click", createNewNote);
 document.getElementById("saveNoteBtn").addEventListener("click", () => saveActiveNote());
 document.getElementById("deleteNoteBtn").addEventListener("click", deleteActiveNote);
-document.getElementById("exportNoteBtn").addEventListener("click", exportActiveNote);
 document.getElementById("exportNotesBtn").addEventListener("click", exportAllNotes);
+document.getElementById("exportNoteBtn").addEventListener("click", exportActiveNote);
 document.getElementById("importNotesBtn").addEventListener("click", () => {
   document.getElementById("importFileInput").click();
 });
 document.getElementById("importFileInput").addEventListener("change", handleImportNotes);
 
-// Initialize the app.
+/* ------------------------------
+   INITIALIZATION & AUTO-SAVE 
+------------------------------ */
 setupToolbar();
 loadNotes();
 updateStorageUsage();
 
-// Auto-save the active note every 3 seconds (silent auto-save).
+// Hide loader once fully loaded.
+window.addEventListener("load", function() {
+  const loader = document.getElementById("loader");
+  loader.style.opacity = 0;
+  setTimeout(() => {
+    loader.style.display = "none";
+  }, 500);
+});
+
+// Auto-save the current note every 3 seconds (silent auto-save).
 setInterval(() => {
   if (activeNoteId) {
     saveActiveNote(true);

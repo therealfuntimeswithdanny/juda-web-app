@@ -3,16 +3,19 @@
 <head>
   <meta charset="UTF-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1" />
-  <title>Notes App</title>
+  <title>Juda Notes</title>
   
-  <!-- Favicon (icon.svg) -->
+  <!-- Favicon -->
   <link rel="icon" href="icon.svg" type="image/svg+xml">
   
   <!-- External CSS -->
   <link rel="stylesheet" href="style.css">
   
-  <!-- Font Awesome Kit (using your provided link) -->
+  <!-- Font Awesome for icons -->
   <script src="https://kit.fontawesome.com/0ca27f8db1.js" crossorigin="anonymous"></script>
+  
+  <!-- LZ-String Library for Compression (via CDN) -->
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/lz-string/1.4.4/lz-string.min.js"></script>
 </head>
 <body>
   <!-- Loader Overlay -->
@@ -22,7 +25,7 @@
   
   <div class="container">
     <!-- Sidebar -->
-    <div id="sidebar">
+    <aside id="sidebar">
       <button id="newNoteBtn" class="sidebar-button">
         <i class="fa-solid fa-plus"></i> New Note
       </button>
@@ -33,20 +36,18 @@
         <i class="fa-solid fa-download"></i> Export All Notes
       </button>
       <ul id="notesList">
-        <!-- Dynamically generated note items will appear here -->
+        <!-- Saved notes will be loaded here by script.js -->
       </ul>
       <div id="sidebarFooter">
-        <p>&copy; 2025-2029 Juda Notes<br>
-          <i>A <a href="https://corp.madebydanny.uk" target="_blank">Funtimes Media</a> Company</i>
-        </p>
+        <p>&copy; 2025-2029 Juda Notes</p>
       </div>
-    </div>
-
-    <!-- Editor Area -->
-    <div id="editor">
+    </aside>
+    
+    <!-- Main Editor Area -->
+    <main id="editor">
       <input type="text" id="noteTitle" placeholder="Note Title" />
       
-      <!-- Toolbar -->
+      <!-- Toolbar for rich text commands -->
       <div id="toolbar">
         <select id="formatBlockSelect">
           <option value="p">Normal Text</option>
@@ -57,37 +58,45 @@
         <button data-command="bold" title="Bold"><i class="fa-solid fa-bold"></i></button>
         <button data-command="italic" title="Italic"><i class="fa-solid fa-italic"></i></button>
         <button data-command="underline" title="Underline"><i class="fa-solid fa-underline"></i></button>
-        <button data-command="insertUnorderedList" title="Bullet List"><i class="fa-solid fa-list-ul"></i></button>
-        <button data-command="insertOrderedList" title="Numbered List"><i class="fa-solid fa-list-ol"></i></button>
-        <button data-command="justifyLeft" title="Align Left"><i class="fa-solid fa-align-left"></i></button>
-        <button data-command="justifyCenter" title="Align Center"><i class="fa-solid fa-align-center"></i></button>
-        <button data-command="justifyRight" title="Align Right"><i class="fa-solid fa-align-right"></i></button>
-        <button id="uploadImageBtn" title="Upload Image"><i class="fa-solid fa-image"></i></button>
+        <button data-command="insertUnorderedList" title="Bullet List">
+          <i class="fa-solid fa-list-ul"></i>
+        </button>
+        <button data-command="insertOrderedList" title="Numbered List">
+          <i class="fa-solid fa-list-ol"></i>
+        </button>
+        <button data-command="justifyLeft" title="Align Left">
+          <i class="fa-solid fa-align-left"></i>
+        </button>
+        <button data-command="justifyCenter" title="Align Center">
+          <i class="fa-solid fa-align-center"></i>
+        </button>
+        <button data-command="justifyRight" title="Align Right">
+          <i class="fa-solid fa-align-right"></i>
+        </button>
       </div>
       
-      <!-- Editable Note Area -->
+      <!-- Editable Content Area -->
       <div id="noteContent" contenteditable="true">
-        Click "New Note" on the Sidebar then start Typing or Select a Note to Edit
+        Click "New Note" on the sidebar then start typing or select a note to edit.
       </div>
       
-      <!-- Bottom Editor Info and Buttons -->
+      <!-- Bottom Editor Controls -->
       <div id="editorButtons">
-        <div id="editorInfo">
-          <span id="storageUsage">Storage used: 0.00 KB (0%) / 3 MB</span>
-          <span id="lastSaved">Last Saved: Never</span>
-        </div>
         <div class="button-group">
           <button id="saveNoteBtn"><i class="fa-solid fa-save"></i> Save Note</button>
           <button id="deleteNoteBtn"><i class="fa-solid fa-trash"></i> Delete Note</button>
           <button id="exportNoteBtn"><i class="fa-solid fa-file-export"></i> Export Active Note</button>
         </div>
+        <div id="editorInfo">
+          <span id="storageUsage">Storage used: 0.00 KB (0%) / 3 MB</span>
+          <span id="lastSaved">Last Saved: Never</span>
+        </div>
       </div>
-    </div>
+    </main>
   </div>
   
-  <!-- Hidden File Inputs -->
-  <input type="file" id="importFileInput" accept=".json" style="display: none;">
-  <input type="file" id="imageFileInput" accept="image/*" style="display: none;">
+  <!-- Hidden File Input for Importing Notes -->
+  <input type="file" id="importFileInput" accept=".json" style="display: none;" />
   
   <!-- External JavaScript -->
   <script src="script.js"></script>
